@@ -151,6 +151,7 @@ class RadarrSet(MutableSet):
             # TODO: should we let the user affect this one,
             # or try to parse the 'quality' entry somehow?
             qualityProfileId = 1
+            addOptions = { 'searchForMovie' : True } if self.config.get('search') else None
 
             try:
                 add_result = self.service.add_movie(
@@ -159,7 +160,9 @@ class RadarrSet(MutableSet):
                     result['titleSlug'],
                     result['images'],
                     result['tmdbId'],
-                    rootFolderPath)
+                    rootFolderPath,
+                    addOptions
+                    )
                 log.verbose('Added movie %ls to Radarr list', result['title'])
             except RadarrMovieAlreadyExistsError:
                 log.warning('Could not add movie %ls because it already exists on Radarr',
@@ -357,6 +360,7 @@ class RadarrList(object):
             'api_key': {'type': 'string'},
             'only_monitored': {'type': 'boolean', 'default': True},
             'include_data': {'type': 'boolean', 'default': False},
+            'search': {'type': 'boolean', 'default': False},
             'only_use_cutoff_quality': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url'],
