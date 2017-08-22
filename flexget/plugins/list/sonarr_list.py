@@ -148,6 +148,7 @@ class SonarrSet(MutableSet):
                           imdb_id=show.get('imdbId'),
                           slug=show.get('titleSlug'),
                           sonarr_id=show.get('id'),
+                          sonarr_added=show.get('added'),
                           configure_series_target=fg_cutoff)
             if self.config.get('include_data'):
                 if len(fg_qualities) > 1:
