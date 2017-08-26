@@ -106,9 +106,10 @@ class DBEntrySet(MutableSet):
             EntryListEntry.list_id == self._db_list(session).id,
             or_(
                 EntryListEntry.title == entry['title'], and_(
-                    EntryListEntry.original_url,
+                    EntryListEntry.original_url.isnot(None),
                     EntryListEntry.original_url == entry[
                         'original_url'])))).first()
+
 
         return db_entry
 

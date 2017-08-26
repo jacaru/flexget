@@ -228,7 +228,7 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, loglevel=None, priority=1):
+    def execute(self, options=None, output=None, loglevel=None, priority=None):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -280,7 +280,8 @@ class Manager(object):
 
         finished_events = []
         for task_name in task_names:
-            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
+            task_priority = priority if priority else self.config['tasks'][task_name].get('priority', 1)
+            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=task_priority)
             self.task_queue.put(task)
             finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
