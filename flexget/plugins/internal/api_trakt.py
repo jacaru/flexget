@@ -1011,6 +1011,10 @@ def update_watched_cache(style_ident, username=None, account=None):
                 cache[series_id]['seasons'] = series['seasons']
                 cache[series_id]['watched_at'] = dateutil_parse(series['last_watched_at'], ignoretz=True)
                 cache[series_id]['plays'] = series['plays']
+                for season in cache[series_id]['seasons']:
+                    for episode in season['episodes']:
+                        episode['watched_at'] = dateutil_parse(episode['last_watched_at'], ignoretz=True)
+            
     except requests.RequestException as e:
         raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
@@ -1191,33 +1195,27 @@ class ApiTrakt(object):
         if not cache['watched'][style_ident]:
             log.warning('No watched data returned from trakt.')
             return
-        watched = False
+        watched = None
         cache = cache['watched'][style_ident]
-        if style == 'show':
-            if trakt_data.id in cache:
-                series = cache[trakt_data.id]
-                # specials are not included
-                number_of_watched_episodes = sum(len(s['episodes']) for s in series['seasons'] if s['number'] > 0)
-                watched = number_of_watched_episodes == trakt_data.aired_episodes
-        elif style == 'episode':
+        if style == 'episode':
             if trakt_data.show.id in cache:
                 series = cache[trakt_data.show.id]
                 for s in series['seasons']:
                     if s['number'] == trakt_data.season:
-                        # extract all episode numbers currently in collection for the season number
-                        episodes = [ep['number'] for ep in s['episodes']]
-                        watched = trakt_data.number in episodes
+                        it = (i for i,v in s['episodes'].enumerate() if s['episodes'][i]['number'] == trakt_data.number)
+                        pos = next(it, None)
+                        watched = s['episodes'][pos]['watched_at'] if pos else None
                         break
         elif style == 'season':
             if trakt_data.show.id in cache:
                 series = cache[trakt_data.show.id]
                 for s in series['seasons']:
                     if trakt_data.number == s['number']:
-                        watched = True
+                        watched = max(e['watched_at'] for e in s['episodes'])
                         break
         else:
             if trakt_data.id in cache:
-                watched = True
+                watched = cache[trakt_data.id]['watched_at']
         log.debug('The result for entry "%s" is: %s', title,
                   'Watched' if watched else 'Not watched')
         return watched

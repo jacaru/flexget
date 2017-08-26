@@ -48,7 +48,9 @@ field_maps = {
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
         'trakt_movie_id': 'movie.ids.trakt',
-        'trakt_movie_slug': 'movie.ids.slug'
+        'trakt_movie_slug': 'movie.ids.slug',
+        'trakt_listed_at': 'listed_at',
+        'trakt_collected_at': 'collected_at'
     },
     'show': {
         'title': generate_show_title,
@@ -60,7 +62,9 @@ field_maps = {
         'tvrage_id': 'show.ids.tvrage',
         'tmdb_id': 'show.ids.tmdb',
         'trakt_show_id': 'show.ids.trakt',
-        'trakt_show_slug': 'show.ids.slug'
+        'trakt_show_slug': 'show.ids.slug',
+        'trakt_listed_at': 'listed_at',
+        'trakt_last_collected_at': 'last_collected_at'
     },
     'episode': {
         'title': generate_episode_title,
@@ -76,7 +80,9 @@ field_maps = {
         'trakt_episode_id': 'episode.ids.trakt',
         'trakt_show_id': 'show.ids.trakt',
         'trakt_show_slug': 'show.ids.slug',
-        'trakt_ep_name': 'episode.title'
+        'trakt_ep_name': 'episode.title',
+        'trakt_listed_at': 'listed_at',
+        'trakt_collected_at': 'collected_at'
     }
 }
 
