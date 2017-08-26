@@ -271,6 +271,7 @@ def render_from_entry(
     # Make a copy of the Entry so we can add some more fields
     variables = copy(entry.store)
     variables['now'] = datetime.now()
+    variables['utcnow'] = datetime.utcnow()
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if hasattr(entry, 'task') and entry.task is not None:
         if 'task' not in variables:
