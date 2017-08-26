@@ -347,7 +347,9 @@ class PluginTraktLookup(object):
             except LookupError as e:
                 log.debug(e)
             else:
-                entry['trakt_watched'] = watched
+                entry['trakt_watched'] = watched != None
+                if watched:
+                    entry['trakt_watched_at'] = watched
         return entry
 
     def lazy_user_ratings_lookup(self, config, style, entry):
@@ -422,7 +424,7 @@ class PluginTraktLookup(object):
                 collected_lookup = functools.partial(self.lazy_collected_lookup, config, style)
                 watched_lookup = functools.partial(self.lazy_watched_lookup, config, style)
                 entry.register_lazy_func(collected_lookup, ['trakt_collected'])
-                entry.register_lazy_func(watched_lookup, ['trakt_watched'])
+                entry.register_lazy_func(watched_lookup, ['trakt_watched', 'trakt_watched_at'])
                 if style in ['show', 'episode', 'season']:
                     # register separate lazy calls to avoid fetching too much unnecessary data
                     entry.register_lazy_func(functools.partial(self.lazy_user_ratings_lookup, config, 'show'),
