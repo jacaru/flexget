@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.qualities import Requirements
-from flexget.utils.radarr import RadarrAPIService
+from flexget.utils.radarr import RadarrAPIService, RadarrMovieAlreadyExistsError, RadarrRequestError
 
 # Maps (lowercase) Radarr qualities to flexget
 # quality reqirement strings
