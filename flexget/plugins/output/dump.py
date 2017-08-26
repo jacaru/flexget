@@ -97,7 +97,7 @@ class OutputDump:
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        if not config and task.options.dump_entries is None:
+        if not config or task.options.dump_entries is None:
             return
 
         eval_lazy = 'eval' in task.options.dump_entries
