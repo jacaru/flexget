@@ -100,15 +100,18 @@ class Manipulate(object):
                 from_field = field
                 if 'from' in config:
                     from_field = config['from']
-                field_value = entry.get(from_field)
-                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
 
                 if config.get('remove'):
-                    if field in entry:
+                    log.debug('remove field: `%s`' % field)
+                    try:
                         del entry[field]
                         modified = True
+                    except KeyError:
+                        pass
                     continue
 
+                field_value = entry.get(from_field)
+                log.debug('field: `%s` from_field: `%s` field_value: `%s`' % (field, from_field, field_value))
                 if 'extract' in config:
                     if not field_value:
                         log.warning('Cannot extract, field `%s` is not present' % from_field)
