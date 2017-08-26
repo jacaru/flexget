@@ -25,6 +25,7 @@ class SonarrSet(MutableSet):
             'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
+            'search': {'type': 'string', 'enum': ['all', 'first_season', 'no']},
             'only_monitored': {'type': 'boolean', 'default': True},
             'include_data': {'type': 'boolean', 'default': False}
         },
@@ -144,7 +145,7 @@ class SonarrSet(MutableSet):
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
                           tvmaze_id=show.get('tvMazeId'),
-                          imdb_id=show.get('imdbid'),
+                          imdb_id=show.get('imdbId'),
                           slug=show.get('titleSlug'),
                           sonarr_id=show.get('id'),
                           configure_series_target=fg_cutoff)
@@ -193,6 +194,16 @@ class SonarrSet(MutableSet):
         show['profileId'] = 1
         show['qualityProfileId '] = 1
         show['rootFolderPath'] = rootfolder[0]['path']
+      
+        if self.config.get('search') == 'no':
+            show['addOptions'] = {'searchForMissingEpisodes' : False}
+        elif self.config.get('search'):
+            show['addOptions'] = {'searchForMissingEpisodes' : True}
+
+        if self.config.get('search') == 'first_season' and len(show['seasons']) > 1:
+            for season in show['seasons']:
+                if season['seasonNumber'] > 1:
+                    season['monitored'] = False
 
         series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                           self.config.get('port'), self.config['api_key'])
