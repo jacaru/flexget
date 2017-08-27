@@ -79,9 +79,7 @@ def request_post_json(url, headers, data):
         else:
             errorMessage = None
             try:
-                json_response = response.json()
-                if len(json_response) > 0 and 'errorMessage' in json_response[0]:
-                    errorMessage = json_response[0]['errorMessage']
+                errorMessage = response.json().get('errorMessage', None)
             except ValueError:
                 # Raised by response.json() if JSON couln't be decoded
                 log.error('Radarr returned non-JSON error result: %s', response.content)
