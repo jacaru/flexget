@@ -195,6 +195,7 @@ class SonarrSet(MutableSet):
         show['profileId'] = 1
         show['qualityProfileId '] = 1
         show['rootFolderPath'] = rootfolder[0]['path']
+        show['seasonFolder'] = True
       
         if self.config.get('search') == 'no':
             show['addOptions'] = {'searchForMissingEpisodes' : False}
