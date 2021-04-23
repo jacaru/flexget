@@ -39,6 +39,11 @@ class SonarrSet(MutableSet):
             'language_id': {'type': 'integer', 'default': 1},
             'season_folder': {'type': 'boolean', 'default': False},
             'monitored': {'type': 'boolean', 'default': True},
+            'monitor': {
+                'type': 'string',
+                'enum': ['unknown', 'all', 'future', 'missing', 'existing', 'firstSeason', 'lastSeason', 'latestSeason', 'pilot', 'recent', 'monitorSpecials', 'unmonitorSpecials', 'none', 'skip'],
+                'default': 'unknown',
+            },
             'root_folder_path': {'type': 'string'},
             'series_type': {
                 'type': 'string',
@@ -217,6 +222,7 @@ class SonarrSet(MutableSet):
             'ignoreEpisodesWithFiles': self.config.get('ignore_episodes_with_files'),
             'ignoreEpisodesWithoutFiles': self.config.get('ignore_episodes_without_files'),
             'searchForMissingEpisodes': self.config.get('search_missing_episodes'),
+            'monitor': self.config.get('monitor'),
         }
 
         logger.debug('adding show {} to sonarr', show)
