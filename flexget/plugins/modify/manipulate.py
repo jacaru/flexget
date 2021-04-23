@@ -109,6 +109,13 @@ class Manipulate:
                 from_field = field
                 if 'from' in config:
                     from_field = config['from']
+                if config.get('remove'):
+                    try:
+                        del entry[field]
+                        modified = True
+                    except KeyError:
+                        pass
+                    continue
                 field_value = entry.get(from_field)
                 logger.debug(
                     'field: `{}` from_field: `{}` field_value: `{}`',
@@ -116,11 +123,6 @@ class Manipulate:
                     from_field,
                     field_value,
                 )
-                if config.get('remove'):
-                    if field in entry:
-                        del entry[field]
-                        modified = True
-                    continue
                 if 'extract' in config:
                     if not field_value:
                         logger.warning('Cannot extract, field `{}` is not present', from_field)
