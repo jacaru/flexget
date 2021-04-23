@@ -161,6 +161,7 @@ class SonarrSet(MutableSet):
                 imdb_id=show.get('imdbid'),
                 slug=show.get('titleSlug'),
                 sonarr_id=show.get('id'),
+                sonarr_added=show.get('added'),
             )
             if len(fg_qualities) > 1:
                 entry['configure_series_qualities'] = fg_qualities
