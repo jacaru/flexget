@@ -394,6 +394,7 @@ class RadarrSet(MutableSet):
         if result:
             root_folders = self.service.get_root_folders()
             root_folder_path = root_folders[0]["path"]
+            add_options = {'searchForMovie': True } if self.config.get('search') else None
 
             try:
                 self.service.add_movie(
@@ -405,6 +406,7 @@ class RadarrSet(MutableSet):
                     result["tmdbId"],
                     root_folder_path,
                     monitored=self.config.get('monitored', False),
+                    add_options=add_options,
                     tags=self.get_tag_ids(entry),
                 )
                 logger.verbose('Added movie {} to Radarr list', result['title'])
@@ -619,6 +621,7 @@ class RadarrList:
             "api_key": {"type": "string"},
             "only_monitored": {"type": "boolean", "default": True},
             "include_data": {"type": "boolean", "default": False},
+            "search": {"type": "boolean", "default": False},
             "only_use_cutoff_quality": {"type": "boolean", "default": False},
             "monitored": {"type": "boolean", "default": True},
             "profile_id": {"type": "integer", "default": 1},
