@@ -63,6 +63,10 @@ class TraktUserCache(TimedDict):
             cache[media_id] = media
             cache[media_id]['watched_at'] = dateutil_parse(media['last_watched_at'], ignoretz=True)
             cache[media_id]['plays'] = media['plays']
+            if 'seasons' in cache[media_id]:
+                for season in cache[media_id]['seasons']:
+                    for episode in season['episodes']:
+                        episode['watched_at'] = dateutil_parse(episode['last_watched_at'], ignoretz=True)
 
     def _update_ratings_cache(self, cache, media_type, username=None, account=None):
         ratings = db.get_user_data(
@@ -134,6 +138,12 @@ class ApiTrakt:
                 'season': self.is_season_watched,
                 'episode': self.is_episode_watched,
                 'movie': self.is_movie_watched,
+            },
+            'watched_at': {
+                'show': self.show_watched_at,
+                'season': self.season_watched_at,
+                'episode': self.episode_watched_at,
+                'movie': self.movie_watched_at,
             },
             'collected': {
                 'show': self.is_show_in_collection,
@@ -327,9 +337,10 @@ class ApiTrakt:
         )
         return in_collection
 
-    def is_show_watched(self, trakt_data, title):
+    def show_watched(self, trakt_data, title):
         cache = user_cache.get_watched_shows(username=self.username, account=self.account)
         is_watched = False
+        watched_at = None
         if trakt_data.id in cache:
             series = cache[trakt_data.id]
             # specials are not included
@@ -337,34 +348,52 @@ class ApiTrakt:
                 len(s['episodes']) for s in series['seasons'] if s['number'] > 0
             )
             is_watched = number_of_watched_episodes == trakt_data.aired_episodes
+            watched_at = cache[trakt_data.id]['watched_at']
 
         logger.debug(
             'The result for show entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
+            watched_at if watched_at else '',
         )
-        return is_watched
+        return is_watched, watched_at
 
-    def is_season_watched(self, trakt_data, title):
+    def is_show_watched(self, trakt_data, title):
+        return self.show_watched(trakt_data, title)[0]
+
+    def show_watched_at(self, trakt_data, title):
+        return self.show_watched(trakt_data, title)[1]
+
+    def season_watched(self, trakt_data, title):
         cache = user_cache.get_watched_shows(username=self.username, account=self.account)
 
         is_watched = False
+        watched_at = None
         if trakt_data.show.id in cache:
             series = cache[trakt_data.show.id]
             for s in series['seasons']:
                 if trakt_data.number == s['number']:
                     is_watched = True
+                    watched_at = max(e['watched_at'] for e in s['episodes'])
                     break
         logger.debug(
             'The result for season entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
+            watched_at if watched_at else '',
         )
-        return is_watched
+        return is_watched, watched_at
 
-    def is_episode_watched(self, trakt_data, title):
+    def is_season_watched(self, trakt_data, title):
+        return self.season_watched(trakt_data, title)[0]
+
+    def season_watched_at(self, trakt_data, title):
+        return self.season_watched(trakt_data, title)[1]
+
+    def episode_watched(self, trakt_data, title):
         cache = user_cache.get_watched_shows(username=self.username, account=self.account)
         is_watched = False
+        watched_at = None
         if trakt_data.show.id in cache:
             series = cache[trakt_data.show.id]
             for s in series['seasons']:
@@ -372,23 +401,44 @@ class ApiTrakt:
                     # extract all episode numbers currently in collection for the season number
                     episodes = [ep['number'] for ep in s['episodes']]
                     is_watched = trakt_data.number in episodes
+                    it = (i for i,v in s['episodes'].enumerate() if s['episodes'][i]['number'] == trakt_data.number)
+                    pos = next(it, None)
+                    watched_at = s['episodes'][pos]['watched_at'] if pos else None
                     break
         logger.debug(
             'The result for episode entry "{}" is: {}',
             title,
             'Watched' if is_watched else 'Not watched',
+            watched_at if watched_at else '',
         )
-        return is_watched
+        return is_watched, watched_at
 
-    def is_movie_watched(self, trakt_data, title):
+    def is_episode_watched(self, trakt_data, title):
+        return self.episode_watched(trakt_data, title)[0]
+
+    def episode_watched_at(self, trakt_data, title):
+        return self.episode_watched(trakt_data, title)[1]
+
+    def movie_watched(self, trakt_data, title):
         cache = user_cache.get_watched_movies(username=self.username, account=self.account)
-        is_watched = trakt_data.id in cache
+        is_watched = False
+        watched_at = None
+        if trakt_data.id in cache:
+            is_watched = True
+            watched_at = cache[trakt_data.id]['watched_at']
         logger.debug(
-            'The result for movie entry "{}" is: {}',
+            'The result for movie entry "{}" is: {} {}',
             title,
             'Watched' if is_watched else 'Not watched',
+            watched_at if watched_at else '',
         )
-        return is_watched
+        return is_watched, watched_at
+
+    def is_movie_watched(self, trakt_data, title):
+        return self.movie_watched(trakt_data, title)[0]
+
+    def movie_watched_at(self, trakt_data, title):
+        return self.movie_watched(trakt_data, title)[1]
 
     def show_user_ratings(self, trakt_data, title):
         cache = user_cache.get_show_user_ratings(username=self.username, account=self.account)
