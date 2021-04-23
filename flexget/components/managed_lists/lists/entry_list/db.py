@@ -157,7 +157,9 @@ class DBEntrySet(MutableSet):
             if stored_entry:
                 # Refresh all the fields if we already have this entry
                 logger.debug('refreshing entry {}', entry)
-                stored_entry.entry = entry
+                new_entry = Entry(stored_entry.entry)
+                new_entry.update(entry)
+                stored_entry.entry = new_entry
             else:
                 logger.debug('adding entry {} to list {}', entry, self._db_list(session).name)
                 stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
