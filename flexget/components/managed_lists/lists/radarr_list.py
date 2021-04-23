@@ -543,6 +543,7 @@ class RadarrSet(MutableSet):
                 title=movie["title"],
                 url="",
                 radarr_id=movie["id"],
+                radarr_added=movie['added'],
                 movie_name=movie["title"],
                 movie_year=movie["year"],
             )
