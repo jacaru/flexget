@@ -268,7 +268,7 @@ class Manager:
     def execute(
         self,
         options: Union[dict, argparse.Namespace] = None,
-        priority: int = 1,
+        priority: int = None,
         suppress_warnings: Sequence[str] = None,
     ) -> List[Tuple[str, str, threading.Event]]:
         """
@@ -321,13 +321,14 @@ class Manager:
 
         finished_events = []
         for task_name in task_names:
+            task_priority = priority if priority else self.config['tasks'][task_name].get('priority', 1)
             task = Task(
                 self,
                 task_name,
                 options=options,
                 output=get_console_output(),
                 session_id=flexget.log.get_log_session_id(),
-                priority=priority,
+                priority=task_priority,
                 suppress_warnings=suppress_warnings,
             )
             self.task_queue.put(task)
