@@ -348,6 +348,7 @@ class PluginTraktLookup:
                 if media_type:
                     add_lazy_user_fields(entry, 'collected', media_type=media_type, **credentials)
                     add_lazy_user_fields(entry, 'watched', media_type=media_type, **credentials)
+                    add_lazy_user_fields(entry, 'watched_at', media_type=media_type, **credentials)
                 if is_show(entry):
                     add_lazy_user_fields(entry, 'ratings', media_type='show', **credentials)
                     if is_season(entry):
