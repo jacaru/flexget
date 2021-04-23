@@ -119,7 +119,7 @@ class DBEntrySet(MutableSet):
                     or_(
                         EntryListEntry.title == entry['title'],
                         and_(
-                            EntryListEntry.original_url,
+                            EntryListEntry.original_url.isnot(None),
                             EntryListEntry.original_url == entry['original_url'],
                         ),
                     ),
