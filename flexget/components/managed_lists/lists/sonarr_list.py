@@ -32,7 +32,7 @@ class SonarrSet(MutableSet):
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': True},
             'include_data': {'type': 'boolean', 'default': False},
-            'search_missing_episodes': {'type': 'boolean', 'default': True},
+            'search_missing_episodes': {'type': 'string', 'enum': ['all', 'first_season', 'no']},
             'ignore_episodes_without_files': {'type': 'boolean', 'default': False},
             'ignore_episodes_with_files': {'type': 'boolean', 'default': False},
             'profile_id': {'type': 'integer', 'default': 1},
@@ -218,8 +218,17 @@ class SonarrSet(MutableSet):
         show['addOptions'] = {
             "ignoreEpisodesWithFiles": self.config.get('ignore_episodes_with_files'),
             "ignoreEpisodesWithoutFiles": self.config.get('ignore_episodes_without_files'),
-            "searchForMissingEpisodes": self.config.get('search_missing_episodes'),
         }
+
+        if self.config.get('searchForMissingEpisodes') == 'no':
+            show['addOptions']['searchForMissingEpisodes'] = False
+        elif self.config.get('searchForMissingEpisodes'):
+            show['addOptions']['searchForMissingEpisodes'] = True
+
+        if self.config.get('searchForMissingEpisodes') == 'first_season' and len(show['seasons']) > 1:
+            for season in show['seasons']:
+                if season['seasonNumber'] > 1:
+                    season['monitored'] = False
 
         logger.debug('adding show {} to sonarr', show)
         returned_show = self._sonarr_request(SERIES_ENDPOINT, method='post', data=show)
