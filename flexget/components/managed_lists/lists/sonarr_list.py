@@ -158,7 +158,7 @@ class SonarrSet(MutableSet):
                 tvdb_id=show.get('tvdbId'),
                 tvrage_id=show.get('tvRageId'),
                 tvmaze_id=show.get('tvMazeId'),
-                imdb_id=show.get('imdbid'),
+                imdb_id=show.get('imdbId'),
                 slug=show.get('titleSlug'),
                 sonarr_id=show.get('id'),
                 sonarr_added=show.get('added'),
