@@ -43,6 +43,8 @@ class FilterIf:
             passed = evaluate_expression(condition, eval_locals)
             if passed:
                 logger.debug('{} matched requirement {}', entry['title'], condition)
+            else:
+                logger.trace('{} did not match requirement {}', entry['title'], condition)
         except UndefinedError as e:
             # Extract the name that did not exist
             missing_field = e.args[0].split("'")[1]
